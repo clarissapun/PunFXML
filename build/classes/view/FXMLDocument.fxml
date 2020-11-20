@@ -28,7 +28,7 @@
       </TableView>
       <Label layoutX="10.0" layoutY="255.0" prefHeight="17.0" prefWidth="127.0" text="enter tracking number" />
       <TextField fx:id="findPackage" layoutX="140.0" layoutY="250.0" />
-      <Button fx:id="search" layoutX="313.0" layoutY="250.0" mnemonicParsing="false" text="Search" />
+      <Button fx:id="searchPackage" layoutX="313.0" layoutY="250.0" mnemonicParsing="false" onAction="#searchPackage" text="Search" />
       <Label layoutX="22.0" layoutY="226.0" text="FIND PACKAGE" />
       <Line endX="300.0" layoutX="92.0" layoutY="195.0" startX="-100.0" />
     </children>

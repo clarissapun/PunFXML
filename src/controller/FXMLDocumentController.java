@@ -17,6 +17,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
@@ -54,29 +56,29 @@ public class FXMLDocumentController implements Initializable {
     private Button readCompanyAndToAddress;
 
     @FXML
-    private TableView<?> packageTable;
+    private TableView<Packages> packageTable;
 
     @FXML
-    private TableColumn<?, ?> tableID;
+    private TableColumn<Packages, Integer> tableID = new TableColumn<>("id");
 
     @FXML
-    private TableColumn<?, ?> tableCompany;
+    private TableColumn<Packages, String> tableCompany = new TableColumn<>("company");
 
     @FXML
-    private TableColumn<?, ?> tableToAddress;
+    private TableColumn<Packages, String> tableToAddress = new TableColumn<>("to address");
 
     @FXML
-    private TableColumn<?, ?> tableFromAddress;
+    private TableColumn<Packages, String> tableFromAddress = new TableColumn<>("from address");
 
     @FXML
     private TextField findPackage;
 
     @FXML
-    private Button search;
+    private Button searchPackage;
     @FXML
     private void handleButtonAction(ActionEvent event) {
-        System.out.println("You clicked me!");
-        label.setText("Hello World!");
+        System.out.println("clicked");
+        ///label.setText("Hello World!");
     }
     
     
@@ -136,7 +138,21 @@ public class FXMLDocumentController implements Initializable {
         }
         
         return pkg;
-    }        
+    }      
+    public Packages readByTracking(String trackingNum){
+        Query query = manager.createNamedQuery("Packages.findByTrackingNumber");
+        
+        // setting query parameter
+        query.setParameter("trackingNumber", trackingNum);
+        
+        // execute query
+        Packages pkg = (Packages) query.getSingleResult();
+        if (pkg != null) {
+            System.out.println(pkg.getId() + " " + pkg.getCompany() + " " + pkg.getToaddress() + " " + pkg.getFromaddress());
+        }
+        
+        return pkg;
+    }   
     
     public List<Packages> readByCompany(String name){
         Query query = manager.createNamedQuery("Packages.findByCompany");
@@ -376,4 +392,19 @@ public class FXMLDocumentController implements Initializable {
         System.out.println(p.toString());
 
     }
+    
+    @FXML
+    void searchPackage(ActionEvent event) {
+        System.out.println("clicked");
+        int packageToFind = Integer.valueOf(findPackage.getText());
+        Packages pkg = readById(packageToFind);
+        //TableView<Packages> table = new TableView<>();
+        tableID.setCellValueFactory(new PropertyValueFactory<>("id"));
+        tableCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
+        tableToAddress.setCellValueFactory(new PropertyValueFactory<>("toaddress"));
+        tableFromAddress.setCellValueFactory(new PropertyValueFactory<>("fromaddress"));
+        packageTable.getItems().add(pkg);
+        //packageTable.getColumns().addAll(tableID, tableCompany, tableToAddress, tableFromAddress);
+    }
+
 }
