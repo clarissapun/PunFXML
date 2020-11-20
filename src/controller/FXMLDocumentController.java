@@ -75,6 +75,15 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private Button searchPackage;
+    
+    @FXML
+    private Button searchAdvanced;
+    
+    @FXML
+    private TextField findCompany;
+
+
+
     @FXML
     private void handleButtonAction(ActionEvent event) {
         System.out.println("clicked");
@@ -170,7 +179,7 @@ public class FXMLDocumentController implements Initializable {
     }        
     
     public List<Packages> readByToFromAddress(String Toaddress, String Fromaddress){
-        Query query = manager.createNamedQuery("Student.findByToaddressAndFromaddress");
+        Query query = manager.createNamedQuery("Packages.findByToaddressAndFromaddress");
         
         // setting query parameter
         query.setParameter("Toaddress", Toaddress);
@@ -186,7 +195,7 @@ public class FXMLDocumentController implements Initializable {
         return pkgs;
     }    
     public List<Packages> readByCompanyToAddress(String company, String toaddress){
-        Query query = manager.createNamedQuery("Student.findByCompanyAndFromaddress");
+        Query query = manager.createNamedQuery("Packages.findByCompanyAndFromaddress");
         
         // setting query parameter
         query.setParameter("company", company);
@@ -406,5 +415,35 @@ public class FXMLDocumentController implements Initializable {
         packageTable.getItems().add(pkg);
         //packageTable.getColumns().addAll(tableID, tableCompany, tableToAddress, tableFromAddress);
     }
+     @FXML
+    void searchAdvanced(ActionEvent event) {
+        System.out.println("advanced search");
+        String packageToFind = findCompany.getText();
+        List<Packages> pkgs = searchForIdAdvanced(packageToFind);
+        tableID.setCellValueFactory(new PropertyValueFactory<>("id"));
+        tableCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
+        tableToAddress.setCellValueFactory(new PropertyValueFactory<>("toaddress"));
+        tableFromAddress.setCellValueFactory(new PropertyValueFactory<>("fromaddress"));
+        for(Packages p : pkgs){
+             packageTable.getItems().add(p);
+        }
+       
+    }
+    public List<Packages> searchForIdAdvanced(String company){
+        Query query = manager.createNamedQuery("Packages.findByCompanyAdvanced");
+        
+        // setting query parameter
+        query.setParameter("company", company);
+        
+        // execute query
+        List<Packages> pkgs =  query.getResultList();
+        for (Packages pkg: pkgs) {
+            System.out.println(pkg.getId() + " " + pkg.getCompany() + " " + pkg.getToaddress() + " " + pkg.getFromaddress());
+        }
+        
+        return pkgs;
+    }    
+    
+    
 
 }

@@ -27,7 +27,12 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Packages.findById", query = "SELECT p FROM Packages p WHERE p.id = :id"),
     @NamedQuery(name = "Packages.findByCompany", query = "SELECT p FROM Packages p WHERE p.company = :company"),
     @NamedQuery(name = "Packages.findByToaddress", query = "SELECT p FROM Packages p WHERE p.toaddress = :toaddress"),
-    @NamedQuery(name = "Packages.findByFromaddress", query = "SELECT p FROM Packages p WHERE p.fromaddress = :fromaddress")})
+    @NamedQuery(name = "Packages.findByFromaddress", query = "SELECT p FROM Packages p WHERE p.fromaddress = :fromaddress"),
+    @NamedQuery(name = "Packages.findByCompanyAdvanced", query = "SELECT p FROM Packages p WHERE LOWER(p.company) LIKE CONCAT(LOWER(:company), '%')")
+                                                            //"SELECT p FROM Packages p WHERE LOWER(p.company) LIKE CONCAT(LOWER(:company), '%')")
+                                                            // "SELECT p FROM Packages p WHERE ((SELECT CAST(p.id as VARCHAR) FROM Packages p) LIKE CONCAT(:id, '%'))")
+})
+
 public class Packages implements Serializable {
 
     private static final long serialVersionUID = 1L;

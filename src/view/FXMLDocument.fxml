@@ -26,10 +26,13 @@
             <TableColumn fx:id="tableFromAddress" prefWidth="102.0" text="From Address" />
         </columns>
       </TableView>
-      <Label layoutX="10.0" layoutY="255.0" prefHeight="17.0" prefWidth="127.0" text="enter tracking number" />
-      <TextField fx:id="findPackage" layoutX="140.0" layoutY="250.0" />
-      <Button fx:id="searchPackage" layoutX="313.0" layoutY="250.0" mnemonicParsing="false" onAction="#searchPackage" text="Search" />
-      <Label layoutX="22.0" layoutY="226.0" text="FIND PACKAGE" />
+      <Label layoutX="16.0" layoutY="227.0" prefHeight="17.0" prefWidth="127.0" text="enter tracking number" />
+      <TextField fx:id="findPackage" layoutX="142.0" layoutY="222.0" />
+      <Button fx:id="searchPackage" layoutX="315.0" layoutY="222.0" mnemonicParsing="false" onAction="#searchPackage" text="Search" />
+      <Label layoutX="20.0" layoutY="205.0" text="FIND PACKAGE" />
       <Line endX="300.0" layoutX="92.0" layoutY="195.0" startX="-100.0" />
+      <Button fx:id="searchAdvanced" layoutX="258.0" layoutY="256.0" mnemonicParsing="false" onAction="#searchAdvanced" text="Advanced Search" />
+      <Label layoutX="12.0" layoutY="261.0" text="enter company" />
+      <TextField fx:id="findCompany" layoutX="96.0" layoutY="256.0" />
     </children>
 </AnchorPane>
