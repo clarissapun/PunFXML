@@ -29,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 import model.Packages;
@@ -38,8 +39,9 @@ import model.Packages;
  * @author clarissapun
  */
 public class FXMLDocumentController implements Initializable {
+
     private EntityManager manager;
-   
+
     @FXML
     private Button button;
 
@@ -57,7 +59,7 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private Button deletePackages;
-    
+
     @FXML
     private Button readToAndFromAddress;
 
@@ -84,14 +86,13 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private Button searchPackage;
-    
+
     @FXML
     private Button searchAdvanced;
-    
+
     @FXML
     private TextField findCompany;
 
-    
     @FXML
     private Button showDetailsP;
 
@@ -100,135 +101,140 @@ public class FXMLDocumentController implements Initializable {
 
     private ObservableList<Packages> pkgData;
 
-
     @FXML
     private void handleButtonAction(ActionEvent event) {
         System.out.println("clicked");
         ///label.setText("Hello World!");
     }
-    
-    
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         manager = (EntityManager) Persistence.createEntityManagerFactory("PunFXMLPU").createEntityManager();
+        tableID.setCellValueFactory(new PropertyValueFactory<>("id"));
+        tableCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
+        tableToAddress.setCellValueFactory(new PropertyValueFactory<>("toaddress"));
+        tableFromAddress.setCellValueFactory(new PropertyValueFactory<>("fromaddress"));
+    }
 
-    }    
     /*
     Implementing CRUD operations
- */
-    
+     */
+
     // Create operation
     public void create(Packages pkg) {
         try {
             // begin transaction
             manager.getTransaction().begin();
-            
+
             // sanity check
             if (pkg.getId() != null) {
-                
+
                 // create package
                 manager.persist(pkg);
-                
+
                 // end transaction
                 manager.getTransaction().commit();
-                
+
                 System.out.println(pkg.toString() + " is created");
             }
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
-    
+
     // Read Operations
-    public List<Packages> readAll(){
+    public List<Packages> readAll() {
         Query query = manager.createNamedQuery("Packages.findAll");
         List<Packages> pkgs = query.getResultList();
 
         for (Packages pkg : pkgs) {
             System.out.println(pkg.getId() + " " + pkg.getCompany() + " " + pkg.getToaddress() + " " + pkg.getFromaddress());
         }
-        
+
         return pkgs;
     }
-    
-    public Packages readById(int id){
+
+    public Packages readById(int id) {
         Query query = manager.createNamedQuery("Packages.findById");
-        
+
         // setting query parameter
         query.setParameter("id", id);
-        
+        Packages pkg = null;
         // execute query
-        Packages pkg = (Packages) query.getSingleResult();
-        if (pkg != null) {
-            System.out.println(pkg.getId() + " " + pkg.getCompany() + " " + pkg.getToaddress() + " " + pkg.getFromaddress());
+        try {
+            pkg = (Packages) query.getSingleResult();
+            if (pkg != null) {
+                System.out.println(pkg.getId() + " " + pkg.getCompany() + " " + pkg.getToaddress() + " " + pkg.getFromaddress());
+            }
+        } catch (NoResultException e) {
+            return null;
         }
-        
+
         return pkg;
-    }      
-    public Packages readByTracking(String trackingNum){
+    }
+
+    public Packages readByTracking(String trackingNum) {
         Query query = manager.createNamedQuery("Packages.findByTrackingNumber");
-        
+
         // setting query parameter
         query.setParameter("trackingNumber", trackingNum);
-        
+
         // execute query
         Packages pkg = (Packages) query.getSingleResult();
         if (pkg != null) {
             System.out.println(pkg.getId() + " " + pkg.getCompany() + " " + pkg.getToaddress() + " " + pkg.getFromaddress());
         }
-        
+
         return pkg;
-    }   
-    
-    public List<Packages> readByCompany(String name){
+    }
+
+    public List<Packages> readByCompany(String name) {
         Query query = manager.createNamedQuery("Packages.findByCompany");
-        
+
         // setting query parameter
         query.setParameter("company", name);
-        
+
         // execute query
-        List<Packages> pkgs =  query.getResultList();
-        for (Packages pkg: pkgs) {
+        List<Packages> pkgs = query.getResultList();
+        for (Packages pkg : pkgs) {
             System.out.println(pkg.getId() + " " + pkg.getCompany() + " " + pkg.getToaddress() + " " + pkg.getFromaddress());
         }
-        
+
         return pkgs;
-    }        
-    
-    public List<Packages> readByToFromAddress(String Toaddress, String Fromaddress){
+    }
+
+    public List<Packages> readByToFromAddress(String Toaddress, String Fromaddress) {
         Query query = manager.createNamedQuery("Packages.findByToaddressAndFromaddress");
-        
+
         // setting query parameter
         query.setParameter("Toaddress", Toaddress);
         query.setParameter("Fromaddress", Fromaddress);
-        
-        
+
         // execute query
-        List<Packages> pkgs =  query.getResultList();
-        for (Packages pkg: pkgs) {
+        List<Packages> pkgs = query.getResultList();
+        for (Packages pkg : pkgs) {
             System.out.println(pkg.getId() + " " + pkg.getCompany() + " " + pkg.getToaddress() + " " + pkg.getFromaddress());
         }
-        
+
         return pkgs;
-    }    
-    public List<Packages> readByCompanyToAddress(String company, String toaddress){
+    }
+
+    public List<Packages> readByCompanyToAddress(String company, String toaddress) {
         Query query = manager.createNamedQuery("Packages.findByCompanyAndFromaddress");
-        
+
         // setting query parameter
         query.setParameter("company", company);
         query.setParameter("Toaddress", toaddress);
-        
-        
+
         // execute query
-        List<Packages> pkgs =  query.getResultList();
-        for (Packages pkg: pkgs) {
+        List<Packages> pkgs = query.getResultList();
+        for (Packages pkg : pkgs) {
             System.out.println(pkg.getId() + " " + pkg.getCompany() + " " + pkg.getToaddress() + " " + pkg.getFromaddress());
         }
-        
-        return pkgs;
-    }    
 
-    
+        return pkgs;
+    }
+
     // Update operation
     public void update(Packages model) {
         try {
@@ -238,14 +244,13 @@ public class FXMLDocumentController implements Initializable {
             if (existingPkg != null) {
                 // begin transaction
                 manager.getTransaction().begin();
-                
+
                 // update all atttributes
                 existingPkg.setId(model.getId());
                 existingPkg.setCompany(model.getCompany());
                 existingPkg.setToaddress(model.getToaddress());
                 existingPkg.setFromaddress(model.getFromaddress());
 
-                
                 // end transaction
                 manager.getTransaction().commit();
             }
@@ -261,13 +266,13 @@ public class FXMLDocumentController implements Initializable {
 
             // sanity check
             if (exisitingPkg != null) {
-                
+
                 // begin transaction
                 manager.getTransaction().begin();
-                
+
                 //remove Package
                 manager.remove(exisitingPkg);
-                
+
                 // end transaction
                 manager.getTransaction().commit();
             }
@@ -275,31 +280,32 @@ public class FXMLDocumentController implements Initializable {
             System.out.println(ex.getMessage());
         }
     }
+
     @FXML
     void createPackages(ActionEvent event) {
         Scanner input = new Scanner(System.in);
-        
+
         // read input from command line
         System.out.println("Enter ID:");
         int id = input.nextInt();
-        
+
         System.out.println("Enter Company:");
         String company = input.next();
-        
+
         System.out.println("Enter To Address:");
         String toAddress = input.nextLine();
-        
+
         System.out.println("Enter From Address:");
         String fromAddress = input.nextLine();
         // create a package instance
         Packages pkg = new Packages();
-        
+
         // set properties
         pkg.setId(id);
         pkg.setCompany(company);
         pkg.setToaddress(toAddress);
         pkg.setFromaddress(fromAddress);
-        
+
         // save this package to database by calling Create operation        
         create(pkg);
     }
@@ -307,26 +313,25 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     void deletePackages(ActionEvent event) {
         Scanner input = new Scanner(System.in);
-        
-         // read input from command line
+
+        // read input from command line
         System.out.println("Enter ID:");
         int id = input.nextInt();
-        
+
         Packages p = readById(id);
-        System.out.println("we are deleting this package: "+ p.toString());
+        System.out.println("we are deleting this package: " + p.toString());
         delete(p);
 
     }
-    
 
     @FXML
     void readByID(ActionEvent event) {
         Scanner input = new Scanner(System.in);
-        
+
         // read input from command line
         System.out.println("Enter ID:");
         int id = input.nextInt();
-        
+
         Packages p = readById(id);
         System.out.println(p.toString());
 
@@ -335,11 +340,11 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     void readByCompany(ActionEvent event) {
         Scanner input = new Scanner(System.in);
-        
+
         // read input from command line
         System.out.println("Enter Company:");
         String name = input.next();
-        
+
         List<Packages> p = readByCompany(name);
         System.out.println(p.toString());
 
@@ -354,29 +359,29 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     void updatePackages(ActionEvent event) {
         Scanner input = new Scanner(System.in);
-        
+
         // read input from command line
         System.out.println("Enter ID:");
         int id = input.nextInt();
-        
+
         System.out.println("Enter Company:");
         String company = input.next();
-        
+
         System.out.println("Enter To Address:");
         String toAddress = input.nextLine();
-        
+
         System.out.println("Enter From Address:");
         String fromAddress = input.nextLine();
-        
+
         // create a package instance
         Packages pkg = new Packages();
-        
+
         // set properties
         pkg.setId(id);
         pkg.setCompany(company);
         pkg.setToaddress(toAddress);
         pkg.setFromaddress(fromAddress);
-        
+
         // save this package to database by calling Create operation        
         update(pkg);
     }
@@ -384,55 +389,60 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     void readByToFromAddress(ActionEvent event) {
         // name and cpga
-        
+
         Scanner input = new Scanner(System.in);
-        
+
         // read input from command line
-        
         System.out.println("Enter To Address:");
         String to = input.nextLine();
-        
+
         System.out.println("Enter From Address:");
         String from = input.nextLine();
-        
+
         // create a student instance      
-        List<Packages> p =  readByToFromAddress(to, from);
+        List<Packages> p = readByToFromAddress(to, from);
         System.out.println(p.toString());
 
     }
+
     @FXML
     void readByCompanyToAddress(ActionEvent event) {
         // name and cpga
-        
+
         Scanner input = new Scanner(System.in);
-        
+
         // read input from command line
-        
         System.out.println("Enter Company:");
         String company = input.nextLine();
-        
+
         System.out.println("Enter To Address:");
         String to = input.nextLine();
-        
+
         // create a student instance      
-        List<Packages> p =  readByToFromAddress(company, to);
+        List<Packages> p = readByToFromAddress(company, to);
         System.out.println(p.toString());
 
     }
-    
+
     @FXML
     void searchPackage(ActionEvent event) {
         System.out.println("clicked");
         int packageToFind = Integer.valueOf(findPackage.getText());
         Packages pkg = readById(packageToFind);
-        tableID.setCellValueFactory(new PropertyValueFactory<>("id"));
-        tableCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
-        tableToAddress.setCellValueFactory(new PropertyValueFactory<>("toaddress"));
-        tableFromAddress.setCellValueFactory(new PropertyValueFactory<>("fromaddress"));
-        packageTable.getItems().add(pkg);
+        if(pkg == null){
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Error!");
+            alert.setHeaderText("enter a different value.");
+            alert.setContentText("No package(s)");
+            alert.showAndWait();
+        }else{
+            packageTable.getItems().add(pkg);
+
+        }
         //packageTable.getColumns().addAll(tableID, tableCompany, tableToAddress, tableFromAddress);
     }
-     @FXML
+
+    @FXML
     void searchAdvanced(ActionEvent event) {
         System.out.println("advanced search");
         String packageToFind = findCompany.getText();
@@ -446,22 +456,19 @@ public class FXMLDocumentController implements Initializable {
         }*/
         alert(pkgs);
     }
-    
-    private List<Packages> searchForIdAdvanced(String company){
+
+    private List<Packages> searchForIdAdvanced(String company) {
         Query query = manager.createNamedQuery("Packages.findByCompanyAdvanced");
-        
-        // setting query parameter
         query.setParameter("company", company);
-        
-        // execute query
-        List<Packages> pkgs =  query.getResultList();
-        for (Packages pkg: pkgs) {
+
+        List<Packages> pkgs = query.getResultList();
+        for (Packages pkg : pkgs) {
             System.out.println(pkg.getId() + " " + pkg.getCompany() + " " + pkg.getToaddress() + " " + pkg.getFromaddress());
         }
-        
+
         return pkgs;
-    }    
-    
+    }
+
     @FXML
     void showDetails(ActionEvent event) throws IOException {
         Packages selected = packageTable.getSelectionModel().getSelectedItem();
@@ -470,7 +477,6 @@ public class FXMLDocumentController implements Initializable {
         Scene tableViewScene = new Scene(detailedModelView);
         DetailedModelViewController detailedController = loader.getController();
 
-        
         detailedController.initData(selected);
 
         // create a new state
@@ -496,35 +502,27 @@ public class FXMLDocumentController implements Initializable {
         stage.setScene(tableViewScene);
         stage.show();
     }
-    
-    void alert(List<Packages> pkgs){
-        if (pkgs== null || pkgs.isEmpty()) {
+
+    void alert(List<Packages> pkgs) {
+        if (pkgs == null || pkgs.isEmpty()) {
 
             Alert alert = new Alert(AlertType.INFORMATION);
-            alert.setTitle("Information Dialog Box");
-            alert.setHeaderText("This is header section to write heading");
-            alert.setContentText("No student");
+            alert.setTitle("Error!");
+            alert.setHeaderText("enter a different value.");
+            alert.setContentText("No package(s)");
             alert.showAndWait();
-        }else{
+        } else {
             setTableData(pkgs);
         }
     }
-    
-    public void setTableData(List<Packages> pkgs) {
 
-        // initialize the studentData variable
+    private void setTableData(List<Packages> pkgs) {
         pkgData = FXCollections.observableArrayList();
-        tableID.setCellValueFactory(new PropertyValueFactory<>("id"));
-        tableCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
-        tableToAddress.setCellValueFactory(new PropertyValueFactory<>("toaddress"));
-        tableFromAddress.setCellValueFactory(new PropertyValueFactory<>("fromaddress"));
 
-        // add the student objects to an observable list object for use with the GUI table
-        pkgs.forEach(s -> {
-            pkgData.add(s);
+        pkgs.forEach(pkg -> {
+            pkgData.add(pkg);
         });
 
-        // set the the table items to the data in studentData; refresh the table
         packageTable.setItems(pkgData);
         packageTable.refresh();
     }
