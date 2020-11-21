@@ -5,13 +5,18 @@
  */
 package controller;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -81,6 +86,13 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     private TextField findCompany;
+
+    
+    @FXML
+    private Button showDetailsP;
+
+    @FXML
+    private Button showDetailsB;
 
 
 
@@ -444,6 +456,54 @@ public class FXMLDocumentController implements Initializable {
         return pkgs;
     }    
     
+    @FXML
+    void showDetails(ActionEvent event) throws IOException {
+        Packages selected = packageTable.getSelectionModel().getSelectedItem();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/DetailedModelView.fxml"));
+        Parent detailedModelView = loader.load();
+        Scene tableViewScene = new Scene(detailedModelView);
+        DetailedModelViewController detailedController = loader.getController();
+
+        
+        detailedController.initData(selected);
+
+        // create a new state
+        Stage stage = new Stage();
+        stage.setScene(tableViewScene);
+        stage.show();
+    }
+
+    @FXML
+    void showDetailsPlace(ActionEvent event) throws IOException {
+         // pass currently selected model
+        Packages selected = packageTable.getSelectionModel().getSelectedItem();
+
+        
+        // fxml loader
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/DetailedModelView.fxml"));
+
+        // load the ui elements
+        Parent detailedModelView = loader.load();
+
+        // load the scene
+        Scene tableViewScene = new Scene(detailedModelView);
+
+        //access the detailedControlled and call a method
+        DetailedModelViewController detailedControlled = loader.getController();
+
+
+        detailedControlled.initData(selected);
+
+        // pass current scene to return
+        Scene currentScene = ((Node) event.getSource()).getScene();
+        detailedControlled.setPreviousScene(currentScene);
+
+        //This line gets the Stage information
+        Stage stage = (Stage) currentScene.getWindow();
+
+        stage.setScene(tableViewScene);
+        stage.show();
+    }
     
 
 }
