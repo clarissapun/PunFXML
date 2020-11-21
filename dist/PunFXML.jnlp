@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="PunFXML.jar" size="351456" download="eager" />
+    <jar href="PunFXML.jar" size="352270" download="eager" />
     <jar href="lib/derbyclient.jar" size="587986" download="eager" />
     <jar href="lib/javax.persistence-2.1.0.jar" size="162126" download="eager" />
     <jar href="lib/org.eclipse.persistence.antlr-2.5.2.jar" size="189645" download="eager" />

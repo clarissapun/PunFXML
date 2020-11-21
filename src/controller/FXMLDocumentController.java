@@ -10,6 +10,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Scanner;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,6 +19,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -94,6 +98,7 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private Button showDetailsB;
 
+    private ObservableList<Packages> pkgData;
 
 
     @FXML
@@ -342,7 +347,8 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     void readPackages(ActionEvent event) {
-        readAll();
+        List<Packages> pkgs = readAll();
+        alert(pkgs);
     }
 
     @FXML
@@ -419,7 +425,6 @@ public class FXMLDocumentController implements Initializable {
         System.out.println("clicked");
         int packageToFind = Integer.valueOf(findPackage.getText());
         Packages pkg = readById(packageToFind);
-        //TableView<Packages> table = new TableView<>();
         tableID.setCellValueFactory(new PropertyValueFactory<>("id"));
         tableCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
         tableToAddress.setCellValueFactory(new PropertyValueFactory<>("toaddress"));
@@ -432,16 +437,17 @@ public class FXMLDocumentController implements Initializable {
         System.out.println("advanced search");
         String packageToFind = findCompany.getText();
         List<Packages> pkgs = searchForIdAdvanced(packageToFind);
-        tableID.setCellValueFactory(new PropertyValueFactory<>("id"));
+        /*tableID.setCellValueFactory(new PropertyValueFactory<>("id"));
         tableCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
         tableToAddress.setCellValueFactory(new PropertyValueFactory<>("toaddress"));
         tableFromAddress.setCellValueFactory(new PropertyValueFactory<>("fromaddress"));
         for(Packages p : pkgs){
              packageTable.getItems().add(p);
-        }
-       
+        }*/
+        alert(pkgs);
     }
-    public List<Packages> searchForIdAdvanced(String company){
+    
+    private List<Packages> searchForIdAdvanced(String company){
         Query query = manager.createNamedQuery("Packages.findByCompanyAdvanced");
         
         // setting query parameter
@@ -475,35 +481,51 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     void showDetailsPlace(ActionEvent event) throws IOException {
-         // pass currently selected model
         Packages selected = packageTable.getSelectionModel().getSelectedItem();
-
-        
-        // fxml loader
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/DetailedModelView.fxml"));
 
-        // load the ui elements
         Parent detailedModelView = loader.load();
-
-        // load the scene
         Scene tableViewScene = new Scene(detailedModelView);
-
-        //access the detailedControlled and call a method
         DetailedModelViewController detailedControlled = loader.getController();
-
-
         detailedControlled.initData(selected);
 
-        // pass current scene to return
         Scene currentScene = ((Node) event.getSource()).getScene();
         detailedControlled.setPreviousScene(currentScene);
 
-        //This line gets the Stage information
         Stage stage = (Stage) currentScene.getWindow();
-
         stage.setScene(tableViewScene);
         stage.show();
     }
     
+    void alert(List<Packages> pkgs){
+        if (pkgs== null || pkgs.isEmpty()) {
 
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("Information Dialog Box");
+            alert.setHeaderText("This is header section to write heading");
+            alert.setContentText("No student");
+            alert.showAndWait();
+        }else{
+            setTableData(pkgs);
+        }
+    }
+    
+    public void setTableData(List<Packages> pkgs) {
+
+        // initialize the studentData variable
+        pkgData = FXCollections.observableArrayList();
+        tableID.setCellValueFactory(new PropertyValueFactory<>("id"));
+        tableCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
+        tableToAddress.setCellValueFactory(new PropertyValueFactory<>("toaddress"));
+        tableFromAddress.setCellValueFactory(new PropertyValueFactory<>("fromaddress"));
+
+        // add the student objects to an observable list object for use with the GUI table
+        pkgs.forEach(s -> {
+            pkgData.add(s);
+        });
+
+        // set the the table items to the data in studentData; refresh the table
+        packageTable.setItems(pkgData);
+        packageTable.refresh();
+    }
 }
